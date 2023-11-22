@@ -16,6 +16,7 @@ import mongoStore from 'connect-mongo';
 import passport from 'passport';
 import './routes/passport/passportStrategies.js';
 import config from './config.js';
+import { errorMiddleware } from './middlewares/error.middlewares.js';
 
 
 const app = express()
@@ -50,6 +51,7 @@ app.use('/api/login',loginRouter)
 app.use('/api/users',usersRouter)
 app.use('/api/home',homeRouter)
 
+app.use(errorMiddleware);
 
 const PORT = config.port;
 

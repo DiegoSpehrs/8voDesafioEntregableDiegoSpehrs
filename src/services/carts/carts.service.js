@@ -1,5 +1,7 @@
 import {cartsMongo} from '../../DAL/DAOs/MongoDAOs/cartsMongo.dao.js';
-import {usersMongo} from '../../DAL/DAOs/MongoDAOs/usersMongo.dao.js'
+import {usersMongo} from '../../DAL/DAOs/MongoDAOs/usersMongo.dao.js';
+import { ErrorMessage } from '../../errors/error.enum.js';
+import CustomError from '../../errors/CustomError.js';
 
 class CartsService {
     async getAllCarts(){
@@ -8,19 +10,19 @@ class CartsService {
     }
     async getCartById(cid) {
         const cart = await cartsMongo.findById(cid);
-        if(!cart) throw new Error('Cart not found'); 
+        if(!cart) throw new CustomError(ErrorMessage.CART_NOT_FOUND); 
         const response = await cartsMongo.model.findById(cid).populate('products');
         return response;
     }
     async createCart(pucharse) {
         console.log(pucharse);
-        if(!pucharse ) throw new Error('some required data is missing');
+        if(!pucharse ) throw new CustomError(ErrorMessage.CART_DATA_MISSING);
         const response = await cartsMongo.createOne({pucharse});
         return response;
     }
     async cartDelete(cid) {
         const cart = await cartsMongo.findById(cid);
-        if(!cart) throw new Error('Cart not found');
+        if(!cart) throw new CustomError(ErrorMessage.CART_NOT_FOUND);
         const response = await cartsMongo.deleteOne(cid);
         return response;
     }
@@ -30,18 +32,18 @@ class CartsService {
     }
     async productDelete(cid,pid) {
         const cart = await cartsMongo.findById(cid);
-        if(!cart) throw new Error('Cart not found');
+        if(!cart) throw new CustomError(ErrorMessage.CART_NOT_FOUND);
         const response = await cartsMongo.model.updateOne({_id:cid},{$pull:{products:pid}});
         return response;
     }
     async updateProduct(cid,pid,quantity) {
         const cart = await cartsMongo.findById(cid);
-        if(!cart) throw new Error('Cart not found');
+        if(!cart) throw new CustomError(ErrorMessage.CART_NOT_FOUND);
         const response = await cartsMongo.model.findById(cid).updateOne({_id:pid},{$inc:{quantity:quantity}});
     }
     async addProduct(cid,pid) {
         const cart = await cartsMongo.findById(cid);
-        if(!cart) throw new Error('Cart not found');
+        if(!cart) throw new CustomError(ErrorMessage.CART_NOT_FOUND);
         const response = await cartsMongo.model.findById(cid).updateOne({$push:{products:pid}});
         return response;
     }
